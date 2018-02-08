@@ -509,7 +509,15 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
         && self.hasFocus == NO && self.isSelected == NO) {
         [self.delegate tokenInputVieShouldBeginEditing:self];
     }
+    BOOL oldSelected = tokenView.selected;
     [self selectTokenView:tokenView animated:YES];
+    if (oldSelected && tokenView.selected &&
+        [self.delegate respondsToSelector:@selector(tokenInputView:didReselectToken:)]) {
+        NSInteger index = [self.tokenViews indexOfObject:tokenView];
+        if (index != NSNotFound) {
+            [self.delegate tokenInputView:self didReselectToken:self.tokens[index]];
+        }
+    }
     if ([self.delegate respondsToSelector:@selector(tokenInputView:didSelectToken:)]) {
         NSInteger index = [self.tokenViews indexOfObject:tokenView];
         if (index != NSNotFound) {

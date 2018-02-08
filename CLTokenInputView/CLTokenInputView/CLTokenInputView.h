@@ -74,6 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)tokenInputView:(CLTokenInputView *)view didChangeHeightTo:(CGFloat)height;
 
 - (void)tokenInputView:(CLTokenInputView *)view didSelectToken:(CLToken *)token;
+- (void)tokenInputView:(CLTokenInputView *)view didReselectToken:(CLToken *)token;
 
 - (void)tokenInputViewWillStartInputText:(CLTokenInputView *)view;
 - (void)tokenInputViewDidEndInputText:(CLTokenInputView *)view;
