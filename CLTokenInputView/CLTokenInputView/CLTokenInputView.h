@@ -123,6 +123,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)beginEditing;
 - (void)endEditing;
 
+- (void)refreshColor;
+
 @end
 
 NS_ASSUME_NONNULL_END

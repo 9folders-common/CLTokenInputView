@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** Used for storing anything that would be useful later on */
 @property (strong, nonatomic, nullable) id context;
 
+@property (strong, nonatomic, nullable) UIColor *tintColor;
 
 - (id)initWithDisplayText:(NSString *)displayText context:(nullable NSObject *)context;
 

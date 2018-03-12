@@ -584,6 +584,19 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     return [self.textField becomeFirstResponder];
 }
 
+- (void)refreshColor
+{
+    [self.tokens enumerateObjectsUsingBlock:^(CLToken * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (self.tokenViews.count > idx) {
+            if (obj.tintColor == nil) {
+                self.tokenViews[idx].tintColor = [UIColor colorWithRed:0.0f/255.0f green:122.0f/255.0f blue:255.0f/255.0f alpha:1.0f];
+            }
+            else {
+                self.tokenViews[idx].tintColor = obj.tintColor;
+            }
+        }
+    }];
+}
 
 #pragma mark - (Optional Views)
 
