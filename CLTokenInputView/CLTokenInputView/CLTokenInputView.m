@@ -26,7 +26,7 @@ static CGFloat const STANDARD_ROW_HEIGHT = 25.0;
 
 static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_X
 
-@interface CLTokenInputView () <CLBackspaceDetectingTextFieldDelegate, CLTokenViewDelegate>
+@interface CLTokenInputView () <CLBackspaceDetectingTextFieldDelegate, CLTokenViewDelegate, UITextDropDelegate>
 
 @property (strong, nonatomic) CL_GENERIC_MUTABLE_ARRAY(CLToken *) *tokens;
 @property (strong, nonatomic) CL_GENERIC_MUTABLE_ARRAY(CLTokenView *) *tokenViews;
@@ -51,6 +51,7 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
     self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
     self.textField.delegate = self;
+    self.textField.textDropDelegate = self;
     self.additionalTextFieldYOffset = 0.0;
     if (![self.textField respondsToSelector:@selector(defaultTextAttributes)]) {
         self.additionalTextFieldYOffset = 1.5;
@@ -693,6 +694,22 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
         CGContextAddLineToPoint(context, CGRectGetWidth(bounds), bounds.size.height);
         CGContextStrokePath(context);
     }
+}
+
+#pragma mark -  UITextDropDelegate
+
+- (UITextDropEditability)textDroppableView:(UIView<UITextDroppable> *)textDroppableView willBecomeEditableForDrop:(id<UITextDropRequest>)drop API_AVAILABLE(ios(11.0))
+{
+    return UITextDropEditabilityNo;
+}
+
+- (UITextDropProposal*)textDroppableView:(UIView<UITextDroppable> *)textDroppableView proposalForDrop:(id<UITextDropRequest>)drop API_AVAILABLE(ios(11.0))
+{
+    if (@available(iOS 11.0, *)) {
+        UITextDropProposal *proposal = [[UITextDropProposal alloc] initWithDropOperation:UIDropOperationForbidden];
+        return proposal;
+    }
+    return nil;
 }
 
 @end
