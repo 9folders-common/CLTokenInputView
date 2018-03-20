@@ -218,6 +218,13 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     return token;
 }
 
+- (void)editCancelAndClearText
+{
+    self.textField.text = @"";
+    // Clearing text programmatically doesn't call this automatically
+    [self onTextFieldDidChange:self.textField];
+}
+
 - (BOOL)isSelected
 {
     for (CLTokenView *v in self.tokenViews) {
