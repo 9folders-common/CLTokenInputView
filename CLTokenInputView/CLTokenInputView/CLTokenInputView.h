@@ -126,6 +126,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)refreshColor;
 
+// selecting
+- (nullable CLToken *)selectPreviousToken;
+- (nullable CLToken *)selectNextToken;
+
 @end
 
 NS_ASSUME_NONNULL_END

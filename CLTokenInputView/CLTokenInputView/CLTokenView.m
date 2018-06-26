@@ -21,11 +21,10 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
 
 @property (strong, nonatomic) UIView *backgroundView;
 @property (strong, nonatomic) UILabel *label;
-
 @property (strong, nonatomic) UIView *selectedBackgroundView;
 @property (strong, nonatomic) UILabel *selectedLabel;
-
 @property (copy, nonatomic) NSString *displayText;
+@property (strong, nonatomic) CLToken *internalToken;
 
 @end
 
@@ -35,6 +34,8 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
 {
     self = [super initWithFrame:CGRectZero];
     if (self) {
+        self.internalToken = token;
+        
         UIColor *tintColor = [UIColor colorWithRed:0.0823 green:0.4941 blue:0.9843 alpha:1.0];
         if ([self respondsToSelector:@selector(tintColor)]) {
             tintColor = self.tintColor;
@@ -75,6 +76,13 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
 
     }
     return self;
+}
+
+#pragma mark - Properties
+
+- (CLToken *)token
+{
+    return self.internalToken;
 }
 
 #pragma mark - Size Measurements
@@ -159,7 +167,7 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
             self.selectedBackgroundView.alpha = selectedAlpha;
             self.selectedLabel.alpha = selectedAlpha;
         } completion:^(BOOL finished) {
-            if (!_selected) {
+            if (!selected) {
                 self.selectedBackgroundView.hidden = YES;
                 self.selectedLabel.hidden = YES;
             }
@@ -234,7 +242,12 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
 
 - (void)insertText:(NSString *)text
 {
-    [self.delegate tokenViewDidRequestDelete:self replaceWithText:text];
+    if ([text isEqualToString:@"\t"]) {
+        // do nothing
+    }
+    else {
+        [self.delegate tokenViewDidRequestDelete:self replaceWithText:text];
+    }
 }
 
 - (void)deleteBackward
@@ -260,13 +273,12 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
     return YES;
 }
 
-
 -(BOOL)resignFirstResponder
 {
-    BOOL didResignFirstResponder = [super resignFirstResponder];
+    // NOTE: [super resignFirstResponder]를 호출하면 keyboard notification을 등록한 모든 객체한테 호출이되서 이상한 UI 현상이 발생할 수 있으므로 [super resignFirstResponder]를 호출하지 않는다.
     [self setSelected:NO animated:NO];
     [self.delegate tokenViewReleaseFocus:self];
-    return didResignFirstResponder;
+    return YES;
 }
 
 -(BOOL)becomeFirstResponder

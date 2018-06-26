@@ -101,6 +101,11 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     return CGSizeMake(UIViewNoIntrinsicMetric, MAX(44, self.intrinsicContentHeight));
 }
 
+- (BOOL)isFirstResponder
+{
+    return self.textField.isFirstResponder;
+}
+
 #pragma mark - Tint color
 
 - (void)tintColorDidChange
@@ -276,7 +281,6 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     if (self.accessoryView) {
         CGRect accessoryRect = self.accessoryView.frame;
         accessoryRect.origin.x = CGRectGetWidth(bounds) - PADDING_RIGHT - CGRectGetWidth(accessoryRect);
-//        accessoryRect.origin.y = curY;
         self.accessoryView.frame = accessoryRect;
 
         firstLineRightBoundary = CGRectGetMinX(accessoryRect) - HSPACE;
@@ -364,7 +368,6 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     // Delay selecting the next token slightly, so that on iOS 8
     // the deleteBackward on CLTokenView is not called immediately,
     // causing a double-delete
-//    dispatch_async(dispatch_get_main_queue(), ^{
     DDLogVerbose(@"%s", __PRETTY_FUNCTION__);
     if (textField.text.length == 0) {
         CLTokenView *tokenView = self.tokenViews.lastObject;
@@ -373,7 +376,6 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
             [self.textField resignFirstResponder];
         }
     }
-//    });
 }
 
 #pragma mark - UITextFieldDelegate
@@ -606,6 +608,63 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
             }
         }
     }];
+}
+
+- (nullable CLToken *)selectPreviousToken
+{
+    if (self.textField.isFirstResponder) {
+        CLTokenView *tokenToReturn = self.tokenViews.lastObject;
+        if (tokenToReturn) {
+            [tokenToReturn setSelected:YES animated:YES];
+        }
+        return tokenToReturn.token;
+    }
+    else {
+        CLTokenView *tokenToReturn = nil;
+        for (CLTokenView *v in self.tokenViews) {
+            if (v.selected) {
+                NSInteger index = [self.tokenViews indexOfObject:v];
+                if (index > 0) {
+                    tokenToReturn = self.tokenViews[index - 1];
+                    [v setSelected:NO animated:YES];
+                }
+                else {
+                    tokenToReturn = nil;
+                }
+                break;
+            }
+        }
+        if (tokenToReturn) {
+            [tokenToReturn setSelected:YES animated:YES];
+        }
+        return tokenToReturn.token;
+    }
+}
+
+- (nullable CLToken *)selectNextToken
+{
+    CLTokenView *tokenToReturn = nil;
+    for (CLTokenView *v in self.tokenViews) {
+        if (v.selected) {
+            NSInteger index = [self.tokenViews indexOfObject:v];
+            if (index + 1 < self.tokenViews.count) {
+                tokenToReturn = self.tokenViews[index + 1];
+                [v setSelected:NO animated:YES];
+            }
+            else {
+                tokenToReturn = nil;
+            }
+            break;
+        }
+    }
+    if (tokenToReturn) {
+        [tokenToReturn setSelected:YES animated:YES];
+        return tokenToReturn.token;
+    }
+    else {
+        [self.textField becomeFirstResponder];
+        return nil;
+    }
 }
 
 #pragma mark - (Optional Views)
