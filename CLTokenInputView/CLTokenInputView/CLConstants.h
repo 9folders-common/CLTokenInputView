@@ -9,3 +9,17 @@
 #import <Foundation/Foundation.h>
 
 extern int ddLogLevel;
+
+typedef NS_ENUM(NSInteger, CLTokenInputType) {
+    CLTokenInputTypeTo = 0,
+    CLTokenInputTypeCC,
+    CLTokenInputTypeBCC,
+};
+
+
+@protocol CLTabResponderProtocol
+@required
+@property (weak, nonatomic, nullable) UIView *nextTabResponder;
+@property (weak, nonatomic, nullable) UIView *previousTabResponder;
+@property (assign, nonatomic) CLTokenInputType tokenInputType;
+@end

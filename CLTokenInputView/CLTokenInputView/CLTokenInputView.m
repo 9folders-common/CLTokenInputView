@@ -46,6 +46,9 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
 - (void)commonInit
 {
     self.textField = [[CLBackspaceDetectingTextField alloc] initWithFrame:self.bounds];
+    self.textField.nextTabResponder = self.nextTabResponder;
+    self.textField.previousTabResponder = self.previousTabResponder;
+    self.textField.tokenInputType = self.tokenInputType;
     self.textField.backgroundColor = [UIColor clearColor];
     self.textField.keyboardType = UIKeyboardTypeEmailAddress;
     self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
@@ -106,6 +109,58 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     return self.textField.isFirstResponder;
 }
 
+- (NSArray<UIKeyCommand *> *)keyCommands
+{
+    UIKeyCommand *tabKeyCommand = [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(actionTabKeyCommandButtonPressed:)];
+    UIKeyCommand *shiftTabKeyCommand = [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:UIKeyModifierShift action:@selector(actionShiftTabKeyCommandButtonPressed:)];
+    return @[tabKeyCommand, shiftTabKeyCommand];
+}
+
+#pragma mark - Properties
+
+- (void)setTokenInputType:(CLTokenInputType)recipientType
+{
+    _tokenInputType = recipientType;
+    self.textField.tokenInputType = recipientType;
+    for (CLTokenView *v in self.tokenViews) {
+        v.tokenInputType = recipientType;
+    }
+}
+
+- (void)setNextTabResponder:(UIView *)nextTabResponder
+{
+    _nextTabResponder = nextTabResponder;
+    self.textField.nextTabResponder = nextTabResponder;
+}
+
+- (void)setPreviousTabResponder:(UIView *)previousTabResponder
+{
+    _previousTabResponder = previousTabResponder;
+    self.textField.previousTabResponder = previousTabResponder;
+}
+
+#pragma mark - Actions
+
+- (void)actionTabKeyCommandButtonPressed:(UIKeyCommand *)keyCommand
+{
+    if (self.textField.isFirstResponder) {
+        [[self.textField nextTabResponder] becomeFirstResponder];
+    }
+    else {
+        [self.textField becomeFirstResponder];
+    }
+}
+
+- (void)actionShiftTabKeyCommandButtonPressed:(UIKeyCommand *)keyCommand
+{
+    if (self.textField.isFirstResponder) {
+        [[self.textField previousTabResponder] becomeFirstResponder];
+    }
+    else {
+        [self.textField becomeFirstResponder];
+    }
+}
+
 #pragma mark - Tint color
 
 - (void)tintColorDidChange
@@ -125,6 +180,9 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     
     [self.tokens addObject:token];
     CLTokenView *tokenView = [[CLTokenView alloc] initWithToken:token font:self.textField.font];
+    tokenView.nextTabResponder = self.textField;
+    tokenView.previousTabResponder = self.textField;
+    tokenView.tokenInputType = self.tokenInputType;
     if ([self respondsToSelector:@selector(tintColor)]) {
         tokenView.tintColor = self.tintColor;
     }
@@ -173,6 +231,9 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     [tokens enumerateObjectsUsingBlock:^(CLToken * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [self.tokens addObject:obj];
         CLTokenView *tokenView = [[CLTokenView alloc] initWithToken:obj font:self.textField.font];
+        tokenView.nextTabResponder = self.textField;
+        tokenView.previousTabResponder = self.textField;
+        tokenView.tokenInputType = self.tokenInputType;
         if ([self respondsToSelector:@selector(tintColor)]) {
             tokenView.tintColor = self.tintColor;
         }
@@ -589,6 +650,20 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     // but still return isFirstResponder=NO. So always
     // attempt to resign without checking.
     [self.textField resignFirstResponder];
+}
+
+#pragma mark - First Responder (needed to capture keyboard)
+
+-(BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+-(BOOL)resignFirstResponder
+{
+    // NOTE: [super resignFirstResponder]를 호출하면 keyboard notification을 등록한 모든 객체한테 호출이되서 이상한 UI 현상이 발생할 수 있으므로 [super resignFirstResponder]를 호출하지 않는다.
+    [self.textField resignFirstResponder];
+    return YES;
 }
 
 - (BOOL)becomeFirstResponder

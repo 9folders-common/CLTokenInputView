@@ -16,6 +16,10 @@ static CGFloat const PADDING_Y = 2.0;
 static NSString *const UNSELECTED_LABEL_FORMAT = @"%@,";
 static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
 
+@interface UIView (nextTabResponder)
+- (UIView *)nextTabResponder;
+- (UIView *)previousTabResponder;
+@end
 
 @interface CLTokenView ()
 
@@ -275,17 +279,20 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
 
 -(BOOL)resignFirstResponder
 {
-    // NOTE: [super resignFirstResponder]를 호출하면 keyboard notification을 등록한 모든 객체한테 호출이되서 이상한 UI 현상이 발생할 수 있으므로 [super resignFirstResponder]를 호출하지 않는다.
-    [self setSelected:NO animated:NO];
-    [self.delegate tokenViewReleaseFocus:self];
-    return YES;
+    BOOL ret = [self.nextTabResponder resignFirstResponder];
+    return ret;
 }
 
 -(BOOL)becomeFirstResponder
 {
-    BOOL didBecomeFirstResponder = [super becomeFirstResponder];
-    [self setSelected:YES animated:NO];
-    return didBecomeFirstResponder;
+    BOOL ret = YES;
+    if (self.nextTabResponder.isFirstResponder) {
+        ret = [[self.nextTabResponder nextTabResponder] becomeFirstResponder];
+    }
+    else {
+        ret = [self.nextTabResponder becomeFirstResponder];
+    }
+    return ret;
 }
 
 

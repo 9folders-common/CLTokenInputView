@@ -54,4 +54,23 @@
     [super setDelegate:delegate];
 }
 
+#pragma mark - Responder
+
+-(BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+-(BOOL)resignFirstResponder
+{
+    BOOL ret = [super resignFirstResponder];
+    return ret;
+}
+
+-(BOOL)becomeFirstResponder
+{
+    BOOL ret = [super becomeFirstResponder];
+    return ret;
+}
+
 @end

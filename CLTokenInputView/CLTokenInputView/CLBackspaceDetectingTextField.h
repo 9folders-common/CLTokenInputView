@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CLConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,7 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @since v1.0
  */
-@interface CLBackspaceDetectingTextField : UITextField <UIKeyInput>
+@interface CLBackspaceDetectingTextField : UITextField <UIKeyInput, CLTabResponderProtocol>
+/** CLTabResponderProtocol */
+@property (weak, nonatomic, nullable) UIView *nextTabResponder;
+@property (weak, nonatomic, nullable) UIView *previousTabResponder;
+@property (assign, nonatomic) CLTokenInputType tokenInputType;
 
 @property (weak, nonatomic, nullable) NSObject <CLBackspaceDetectingTextFieldDelegate> *delegate;
 

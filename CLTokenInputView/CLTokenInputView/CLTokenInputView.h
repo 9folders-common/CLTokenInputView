@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "CLConstants.h"
 #import "CLToken.h"
 
 #if __has_feature(objc_generics)
@@ -81,7 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface CLTokenInputView : UIView
+@interface CLTokenInputView : UIView <CLTabResponderProtocol>
 
 @property (weak, nonatomic, nullable) IBOutlet NSObject <CLTokenInputViewDelegate> *delegate;
 /** An optional view that shows up presumably on the first line */
@@ -96,6 +96,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (assign, nonatomic) IBInspectable UITextAutocapitalizationType autocapitalizationType;
 @property (assign, nonatomic) IBInspectable UITextAutocorrectionType autocorrectionType;
 @property (assign, nonatomic) IBInspectable UIKeyboardAppearance keyboardAppearance;
+/** CLTabResponderProtocol */
+@property (weak, nonatomic) UIView *nextTabResponder;
+@property (weak, nonatomic) UIView *previousTabResponder;
+@property (assign, nonatomic) CLTokenInputType tokenInputType;
 
 @property (nonatomic, getter=isSelected) BOOL selected;
 /** 
