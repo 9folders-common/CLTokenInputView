@@ -155,9 +155,9 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
     _selected = selected;
 
     if (selected && !self.isFirstResponder) {
-        [self becomeFirstResponder];
+        [super becomeFirstResponder];
     } else if (!selected && self.isFirstResponder) {
-        [self resignFirstResponder];
+        [super resignFirstResponder];
     }
     CGFloat selectedAlpha = (_selected ? 1.0 : 0.0);
     if (animated) {
@@ -279,19 +279,13 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
 
 -(BOOL)resignFirstResponder
 {
-    BOOL ret = [self.nextTabResponder resignFirstResponder];
+    BOOL ret = [super resignFirstResponder];
     return ret;
 }
 
 -(BOOL)becomeFirstResponder
 {
-    BOOL ret = YES;
-    if (self.nextTabResponder.isFirstResponder) {
-        ret = [[self.nextTabResponder nextTabResponder] becomeFirstResponder];
-    }
-    else {
-        ret = [self.nextTabResponder becomeFirstResponder];
-    }
+    BOOL ret = [super resignFirstResponder];
     return ret;
 }
 

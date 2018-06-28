@@ -692,6 +692,7 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
         if (tokenToReturn) {
             [tokenToReturn setSelected:YES animated:YES];
         }
+        [self.textField resignFirstResponder];
         return tokenToReturn.token;
     }
     else {
