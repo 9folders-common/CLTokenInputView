@@ -687,6 +687,9 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
 
 - (nullable CLToken *)selectPreviousToken
 {
+    if (self.tokens.count == 0) {
+        return nil;
+    }
     if (self.textField.isFirstResponder) {
         CLTokenView *tokenToReturn = self.tokenViews.lastObject;
         if (tokenToReturn) {
@@ -719,6 +722,9 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
 
 - (nullable CLToken *)selectNextToken
 {
+    if (self.tokens.count == 0) {
+        return nil;
+    }
     CLTokenView *tokenToReturn = nil;
     for (CLTokenView *v in self.tokenViews) {
         if (v.selected) {
