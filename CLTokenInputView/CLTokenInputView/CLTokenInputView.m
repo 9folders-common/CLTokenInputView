@@ -46,6 +46,9 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
 - (void)commonInit
 {
     self.textField = [[CLBackspaceDetectingTextField alloc] initWithFrame:self.bounds];
+    self.textField.nextTabResponder = self.nextTabResponder;
+    self.textField.previousTabResponder = self.previousTabResponder;
+    self.textField.tokenInputType = self.tokenInputType;
     self.textField.backgroundColor = [UIColor clearColor];
     self.textField.keyboardType = UIKeyboardTypeEmailAddress;
     self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
@@ -101,6 +104,63 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     return CGSizeMake(UIViewNoIntrinsicMetric, MAX(44, self.intrinsicContentHeight));
 }
 
+- (BOOL)isFirstResponder
+{
+    return self.textField.isFirstResponder;
+}
+
+- (NSArray<UIKeyCommand *> *)keyCommands
+{
+    UIKeyCommand *tabKeyCommand = [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(actionTabKeyCommandButtonPressed:)];
+    UIKeyCommand *shiftTabKeyCommand = [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:UIKeyModifierShift action:@selector(actionShiftTabKeyCommandButtonPressed:)];
+    return @[tabKeyCommand, shiftTabKeyCommand];
+}
+
+#pragma mark - Properties
+
+- (void)setTokenInputType:(CLTokenInputType)recipientType
+{
+    _tokenInputType = recipientType;
+    self.textField.tokenInputType = recipientType;
+    for (CLTokenView *v in self.tokenViews) {
+        v.tokenInputType = recipientType;
+    }
+}
+
+- (void)setNextTabResponder:(UIView *)nextTabResponder
+{
+    _nextTabResponder = nextTabResponder;
+    self.textField.nextTabResponder = nextTabResponder;
+}
+
+- (void)setPreviousTabResponder:(UIView *)previousTabResponder
+{
+    _previousTabResponder = previousTabResponder;
+    self.textField.previousTabResponder = previousTabResponder;
+}
+
+#pragma mark - Actions
+
+- (void)actionTabKeyCommandButtonPressed:(UIKeyCommand *)keyCommand
+{
+    if (self.textField.isFirstResponder) {
+        [[self.textField nextTabResponder] becomeFirstResponder];
+    }
+    else {
+        [self.textField becomeFirstResponder];
+    }
+}
+
+- (void)actionShiftTabKeyCommandButtonPressed:(UIKeyCommand *)keyCommand
+{
+    if (self.textField.isFirstResponder) {
+        [[self.textField previousTabResponder] becomeFirstResponder];
+    }
+    else {
+        [self.textField becomeFirstResponder];
+    }
+}
+
 #pragma mark - Tint color
 
 - (void)tintColorDidChange
@@ -120,6 +180,9 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     
     [self.tokens addObject:token];
     CLTokenView *tokenView = [[CLTokenView alloc] initWithToken:token font:self.textField.font];
+    tokenView.nextTabResponder = self.textField;
+    tokenView.previousTabResponder = self.textField;
+    tokenView.tokenInputType = self.tokenInputType;
     if ([self respondsToSelector:@selector(tintColor)]) {
         tokenView.tintColor = self.tintColor;
     }
@@ -168,6 +231,9 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     [tokens enumerateObjectsUsingBlock:^(CLToken * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [self.tokens addObject:obj];
         CLTokenView *tokenView = [[CLTokenView alloc] initWithToken:obj font:self.textField.font];
+        tokenView.nextTabResponder = self.textField;
+        tokenView.previousTabResponder = self.textField;
+        tokenView.tokenInputType = self.tokenInputType;
         if ([self respondsToSelector:@selector(tintColor)]) {
             tokenView.tintColor = self.tintColor;
         }
@@ -276,7 +342,6 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     if (self.accessoryView) {
         CGRect accessoryRect = self.accessoryView.frame;
         accessoryRect.origin.x = CGRectGetWidth(bounds) - PADDING_RIGHT - CGRectGetWidth(accessoryRect);
-//        accessoryRect.origin.y = curY;
         self.accessoryView.frame = accessoryRect;
 
         firstLineRightBoundary = CGRectGetMinX(accessoryRect) - HSPACE;
@@ -364,7 +429,6 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     // Delay selecting the next token slightly, so that on iOS 8
     // the deleteBackward on CLTokenView is not called immediately,
     // causing a double-delete
-//    dispatch_async(dispatch_get_main_queue(), ^{
     DDLogVerbose(@"%s", __PRETTY_FUNCTION__);
     if (textField.text.length == 0) {
         CLTokenView *tokenView = self.tokenViews.lastObject;
@@ -373,7 +437,6 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
             [self.textField resignFirstResponder];
         }
     }
-//    });
 }
 
 #pragma mark - UITextFieldDelegate
@@ -589,6 +652,20 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     [self.textField resignFirstResponder];
 }
 
+#pragma mark - First Responder (needed to capture keyboard)
+
+-(BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+-(BOOL)resignFirstResponder
+{
+    // NOTE: [super resignFirstResponder]를 호출하면 keyboard notification을 등록한 모든 객체한테 호출이되서 이상한 UI 현상이 발생할 수 있으므로 [super resignFirstResponder]를 호출하지 않는다.
+    [self.textField resignFirstResponder];
+    return YES;
+}
+
 - (BOOL)becomeFirstResponder
 {
     return [self.textField becomeFirstResponder];
@@ -606,6 +683,64 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
             }
         }
     }];
+}
+
+- (nullable CLToken *)selectPreviousToken
+{
+    if (self.textField.isFirstResponder) {
+        CLTokenView *tokenToReturn = self.tokenViews.lastObject;
+        if (tokenToReturn) {
+            [tokenToReturn setSelected:YES animated:YES];
+        }
+        [self.textField resignFirstResponder];
+        return tokenToReturn.token;
+    }
+    else {
+        CLTokenView *tokenToReturn = nil;
+        for (CLTokenView *v in self.tokenViews) {
+            if (v.selected) {
+                NSInteger index = [self.tokenViews indexOfObject:v];
+                if (index > 0) {
+                    tokenToReturn = self.tokenViews[index - 1];
+                    [v setSelected:NO animated:YES];
+                }
+                else {
+                    tokenToReturn = nil;
+                }
+                break;
+            }
+        }
+        if (tokenToReturn) {
+            [tokenToReturn setSelected:YES animated:YES];
+        }
+        return tokenToReturn.token;
+    }
+}
+
+- (nullable CLToken *)selectNextToken
+{
+    CLTokenView *tokenToReturn = nil;
+    for (CLTokenView *v in self.tokenViews) {
+        if (v.selected) {
+            NSInteger index = [self.tokenViews indexOfObject:v];
+            if (index + 1 < self.tokenViews.count) {
+                tokenToReturn = self.tokenViews[index + 1];
+                [v setSelected:NO animated:YES];
+            }
+            else {
+                tokenToReturn = nil;
+            }
+            break;
+        }
+    }
+    if (tokenToReturn) {
+        [tokenToReturn setSelected:YES animated:YES];
+        return tokenToReturn.token;
+    }
+    else {
+        [self.textField becomeFirstResponder];
+        return nil;
+    }
 }
 
 #pragma mark - (Optional Views)

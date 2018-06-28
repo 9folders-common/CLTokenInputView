@@ -45,11 +45,6 @@
             shouldDelete = keyboardInputShouldDelete(self, _cmd, textField);
         }
     }
-#if 0
-    if (![textField.text length] && [[[UIDevice currentDevice] systemVersion] intValue] >= 8) {
-        [self deleteBackward];
-    }
-#endif
     return shouldDelete;
 }
 
@@ -57,6 +52,25 @@
 - (void)setDelegate:(NSObject<CLBackspaceDetectingTextFieldDelegate> *)delegate
 {
     [super setDelegate:delegate];
+}
+
+#pragma mark - Responder
+
+-(BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+-(BOOL)resignFirstResponder
+{
+    BOOL ret = [super resignFirstResponder];
+    return ret;
+}
+
+-(BOOL)becomeFirstResponder
+{
+    BOOL ret = [super becomeFirstResponder];
+    return ret;
 }
 
 @end

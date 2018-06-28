@@ -16,16 +16,19 @@ static CGFloat const PADDING_Y = 2.0;
 static NSString *const UNSELECTED_LABEL_FORMAT = @"%@,";
 static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
 
+@interface UIView (nextTabResponder)
+- (UIView *)nextTabResponder;
+- (UIView *)previousTabResponder;
+@end
 
 @interface CLTokenView ()
 
 @property (strong, nonatomic) UIView *backgroundView;
 @property (strong, nonatomic) UILabel *label;
-
 @property (strong, nonatomic) UIView *selectedBackgroundView;
 @property (strong, nonatomic) UILabel *selectedLabel;
-
 @property (copy, nonatomic) NSString *displayText;
+@property (strong, nonatomic) CLToken *internalToken;
 
 @end
 
@@ -35,6 +38,8 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
 {
     self = [super initWithFrame:CGRectZero];
     if (self) {
+        self.internalToken = token;
+        
         UIColor *tintColor = [UIColor colorWithRed:0.0823 green:0.4941 blue:0.9843 alpha:1.0];
         if ([self respondsToSelector:@selector(tintColor)]) {
             tintColor = self.tintColor;
@@ -75,6 +80,13 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
 
     }
     return self;
+}
+
+#pragma mark - Properties
+
+- (CLToken *)token
+{
+    return self.internalToken;
 }
 
 #pragma mark - Size Measurements
@@ -143,9 +155,9 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
     _selected = selected;
 
     if (selected && !self.isFirstResponder) {
-        [self becomeFirstResponder];
+        [super becomeFirstResponder];
     } else if (!selected && self.isFirstResponder) {
-        [self resignFirstResponder];
+        [super resignFirstResponder];
     }
     CGFloat selectedAlpha = (_selected ? 1.0 : 0.0);
     if (animated) {
@@ -159,7 +171,7 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
             self.selectedBackgroundView.alpha = selectedAlpha;
             self.selectedLabel.alpha = selectedAlpha;
         } completion:^(BOOL finished) {
-            if (!_selected) {
+            if (!selected) {
                 self.selectedBackgroundView.hidden = YES;
                 self.selectedLabel.hidden = YES;
             }
@@ -234,7 +246,12 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
 
 - (void)insertText:(NSString *)text
 {
-    [self.delegate tokenViewDidRequestDelete:self replaceWithText:text];
+    if ([text isEqualToString:@"\t"]) {
+        // do nothing
+    }
+    else {
+        [self.delegate tokenViewDidRequestDelete:self replaceWithText:text];
+    }
 }
 
 - (void)deleteBackward
@@ -260,20 +277,16 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
     return YES;
 }
 
-
 -(BOOL)resignFirstResponder
 {
-    BOOL didResignFirstResponder = [super resignFirstResponder];
-    [self setSelected:NO animated:NO];
-    [self.delegate tokenViewReleaseFocus:self];
-    return didResignFirstResponder;
+    BOOL ret = [super resignFirstResponder];
+    return ret;
 }
 
 -(BOOL)becomeFirstResponder
 {
-    BOOL didBecomeFirstResponder = [super becomeFirstResponder];
-    [self setSelected:YES animated:NO];
-    return didBecomeFirstResponder;
+    BOOL ret = [super resignFirstResponder];
+    return ret;
 }
 
 
