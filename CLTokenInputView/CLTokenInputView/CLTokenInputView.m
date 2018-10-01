@@ -411,6 +411,9 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
         self.textField.placeholder = nil;
     } else {
         self.textField.placeholder = self.placeholderText;
+        if (self.placeholderTextColor) {
+            self.textField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:self.textField.placeholder attributes:@{NSForegroundColorAttributeName : self.placeholderTextColor}];
+        }
     }
 }
 
@@ -798,6 +801,15 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
         return;
     }
     _placeholderText = placeholderText;
+    [self updatePlaceholderTextVisibility];
+}
+
+- (void)setPlaceholderTextColor:(UIColor *)placeholderTextColor
+{
+    if (_placeholderTextColor == placeholderTextColor) {
+        return;
+    }
+    _placeholderTextColor = placeholderTextColor;
     [self updatePlaceholderTextVisibility];
 }
 
