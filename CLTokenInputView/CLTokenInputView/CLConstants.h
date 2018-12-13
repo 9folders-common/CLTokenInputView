@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-extern int ddLogLevel;
-
 typedef NS_ENUM(NSInteger, CLTokenInputType) {
     CLTokenInputTypeTo = 0,
     CLTokenInputTypeCC,

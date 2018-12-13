@@ -14,6 +14,8 @@
 #import <CocoaLumberjack/CocoaLumberjack.h>
 #import "CLConstants.h"
 
+extern int ddLogLevel;
+
 static CGFloat const HSPACE = 0.0;
 static CGFloat const TEXT_FIELD_HSPACE = 4.0; // Note: Same as CLTokenView.PADDING_X
 static CGFloat const VSPACE = 4.0;
