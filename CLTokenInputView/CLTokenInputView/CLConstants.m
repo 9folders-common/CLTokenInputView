@@ -8,10 +8,3 @@
 
 #import "CLConstants.h"
 #import <CocoaLumberjack/CocoaLumberjack.h>
-
-int ddLogLevel =
-#ifdef DEBUG
-DDLogLevelVerbose;
-#else
-DDLogLevelError;
-#endif
