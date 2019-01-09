@@ -269,6 +269,15 @@ static NSString *const UNSELECTED_LABEL_NO_COMMA_FORMAT = @"%@";
     return UITextAutocorrectionTypeNo;
 }
 
+- (UIKeyboardAppearance)keyboardAppearance
+{
+    return _keyboardAppearanceType;
+}
+
+- (void)setKeyboardAppearanceType:(UIKeyboardAppearance)keyboardAppearanceType
+{
+    _keyboardAppearanceType = keyboardAppearanceType;
+}
 
 #pragma mark - First Responder (needed to capture keyboard)
 

@@ -180,6 +180,7 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     
     [self.tokens addObject:token];
     CLTokenView *tokenView = [[CLTokenView alloc] initWithToken:token font:self.textField.font];
+    tokenView.keyboardAppearanceType = self.keyboardAppearance;
     tokenView.nextTabResponder = self.textField;
     tokenView.previousTabResponder = self.textField;
     tokenView.tokenInputType = self.tokenInputType;
@@ -231,6 +232,7 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     [tokens enumerateObjectsUsingBlock:^(CLToken * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [self.tokens addObject:obj];
         CLTokenView *tokenView = [[CLTokenView alloc] initWithToken:obj font:self.textField.font];
+        tokenView.keyboardAppearanceType = self.keyboardAppearance;
         tokenView.nextTabResponder = self.textField;
         tokenView.previousTabResponder = self.textField;
         tokenView.tokenInputType = self.tokenInputType;

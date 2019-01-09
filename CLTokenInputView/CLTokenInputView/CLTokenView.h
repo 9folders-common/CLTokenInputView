@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) UIView *nextTabResponder;
 @property (weak, nonatomic) UIView *previousTabResponder;
 @property (assign, nonatomic) CLTokenInputType tokenInputType;
+@property (assign, nonatomic) IBInspectable UIKeyboardAppearance keyboardAppearanceType;
 
 @property (weak, nonatomic, nullable) NSObject <CLTokenViewDelegate> *delegate;
 @property (assign, nonatomic) BOOL selected;
