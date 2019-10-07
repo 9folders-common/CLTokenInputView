@@ -434,7 +434,7 @@ static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_
     // Delay selecting the next token slightly, so that on iOS 8
     // the deleteBackward on CLTokenView is not called immediately,
     // causing a double-delete
-    DDLogVerbose(@"%s", __PRETTY_FUNCTION__);
+    //DDLogVerbose(@"%s", __PRETTY_FUNCTION__);
     if (textField.text.length == 0) {
         CLTokenView *tokenView = self.tokenViews.lastObject;
         if (tokenView != nil && tokenView.selected == NO) {
