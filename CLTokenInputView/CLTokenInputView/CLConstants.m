@@ -7,4 +7,3 @@
 //
 
 #import "CLConstants.h"
-#import <CocoaLumberjack/CocoaLumberjack.h>
