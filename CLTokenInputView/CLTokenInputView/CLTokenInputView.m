@@ -18,7 +18,7 @@ static CGFloat const MINIMUM_TEXTFIELD_WIDTH = 56.0;
 static CGFloat const PADDING_TOP = 10.0;
 static CGFloat const PADDING_BOTTOM = 10.0;
 static CGFloat const PADDING_LEFT = 8.0;
-static CGFloat const PADDING_RIGHT = 8.0;
+static CGFloat const PADDING_RIGHT = 15.0;
 static CGFloat const STANDARD_ROW_HEIGHT = 25.0;
 
 static CGFloat const FIELD_MARGIN_X = 4.0; // Note: Same as CLTokenView.PADDING_X
