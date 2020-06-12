@@ -58,7 +58,7 @@
 
 -(BOOL)canBecomeFirstResponder
 {
-    return YES;
+    return [super canBecomeFirstResponder];
 }
 
 -(BOOL)resignFirstResponder
